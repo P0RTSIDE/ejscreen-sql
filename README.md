@@ -104,6 +104,10 @@ make all
 
 `make validate` exits with a nonzero status if an assertion fails. It exits 0 when assertions pass, even if a match rate check fails. The report states which checks failed.
 
+## Optional docs site
+
+`site/` is a minimal static page that links to the GitHub docs. For Vercel, create a project from this repository and set the Root Directory to `site`. No build step is required.
+
 ## Known limitations
 
 The technical documentation does not state a rounding rule. Values are computed in full precision, so a published field stored at 15 decimal places is not always bit identical to the rebuilt double.
