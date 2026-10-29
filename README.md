@@ -106,7 +106,7 @@ make all
 
 ## Optional docs site
 
-`site/` is a minimal static page that links to the GitHub docs. For Vercel, create a project from this repository and set the Root Directory to `site`. No build step is required.
+`site/` is a minimal static page that links to the GitHub docs. The root `vercel.json` forces a static deploy of `site/` (Framework Preset Other, no Python runtime), so a Dashboard Root Directory override is optional. If you set one anyway, use `site`. No build step is required.
 
 ## Known limitations
 

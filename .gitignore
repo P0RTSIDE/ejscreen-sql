@@ -31,3 +31,6 @@ __pycache__/
 *.egg-info/
 .python-version
 .DS_Store
+
+# Local Vercel CLI output
+.vercel/
