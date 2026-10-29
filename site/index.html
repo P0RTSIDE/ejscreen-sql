@@ -14,6 +14,8 @@
       --paper: #eef3ef;
       --band: #1f3d32;
       --accent: #c45c26;
+      --line: #c5d2c9;
+      --field: #f7faf8;
     }
     * { box-sizing: border-box; }
     body {
@@ -31,6 +33,9 @@
       margin: 0 auto;
       padding: 4.5rem 1.25rem 5rem;
     }
+    main.wide {
+      max-width: 56rem;
+    }
     .brand {
       font-family: "IBM Plex Serif", serif;
       font-size: clamp(2rem, 5vw, 2.75rem);
@@ -44,6 +49,14 @@
       font-weight: 600;
       margin: 0 0 0.75rem;
     }
+    h2 {
+      font-family: "IBM Plex Serif", serif;
+      font-size: 1.45rem;
+      font-weight: 600;
+      color: var(--band);
+      margin: 0 0 0.5rem;
+      letter-spacing: -0.01em;
+    }
     p { margin: 0 0 1rem; color: var(--muted); }
     .cta {
       display: inline-flex;
@@ -51,18 +64,31 @@
       flex-wrap: wrap;
       margin: 1.5rem 0 2.25rem;
     }
-    a.button {
+    a.button, button.run {
       display: inline-block;
       padding: 0.7rem 1rem;
       background: var(--band);
       color: #f7faf8;
       text-decoration: none;
       font-weight: 600;
+      border: none;
+      font-family: inherit;
+      font-size: 0.95rem;
+      cursor: pointer;
     }
     a.button.secondary {
       background: transparent;
       color: var(--band);
       outline: 1px solid var(--band);
+    }
+    button.run:hover { filter: brightness(1.08); }
+    button.run:focus-visible,
+    a.button:focus-visible,
+    .preset:focus-visible,
+    input:focus-visible,
+    select:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 2px;
     }
     ul {
       padding-left: 1.1rem;
@@ -76,10 +102,121 @@
       font-size: 0.9rem;
       color: var(--muted);
     }
+    .playground {
+      margin-top: 3rem;
+      padding-top: 2.25rem;
+      border-top: 1px solid var(--line);
+      animation: rise 0.7s ease-out both;
+    }
+    @keyframes rise {
+      from { opacity: 0; transform: translateY(0.6rem); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .notice {
+      margin: 0 0 1.25rem;
+      color: var(--ink);
+      font-size: 0.95rem;
+    }
+    .filters {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 0.85rem 1rem;
+      margin: 1.25rem 0 1rem;
+    }
+    @media (max-width: 640px) {
+      .filters { grid-template-columns: 1fr; }
+    }
+    label {
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--band);
+    }
+    input, select {
+      width: 100%;
+      padding: 0.55rem 0.65rem;
+      border: 1px solid var(--line);
+      background: var(--field);
+      color: var(--ink);
+      font-family: inherit;
+      font-size: 0.95rem;
+      font-weight: 400;
+    }
+    .presets {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin: 0 0 1rem;
+    }
+    .preset {
+      background: transparent;
+      border: 1px solid var(--band);
+      color: var(--band);
+      padding: 0.4rem 0.7rem;
+      font-family: inherit;
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: background 0.2s ease, color 0.2s ease;
+    }
+    .preset:hover, .preset[aria-pressed="true"] {
+      background: var(--band);
+      color: #f7faf8;
+    }
+    .run-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 1rem;
+    }
+    .status {
+      font-size: 0.9rem;
+      color: var(--muted);
+      min-height: 1.35em;
+    }
+    .results-wrap {
+      overflow-x: auto;
+      border-top: 1px solid var(--line);
+      max-height: 28rem;
+      overflow-y: auto;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.85rem;
+    }
+    th, td {
+      text-align: left;
+      padding: 0.45rem 0.55rem;
+      border-bottom: 1px solid var(--line);
+      white-space: nowrap;
+    }
+    th {
+      position: sticky;
+      top: 0;
+      background: #e4ebe6;
+      color: var(--band);
+      font-weight: 600;
+      z-index: 1;
+    }
+    tbody tr {
+      animation: fade-row 0.35s ease both;
+    }
+    @keyframes fade-row {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    td.num { font-variant-numeric: tabular-nums; }
+    .empty {
+      color: var(--muted);
+      padding: 0.75rem 0;
+    }
   </style>
 </head>
 <body>
-  <main>
+  <main class="wide">
     <p class="brand">EJScreen SQL</p>
     <h1>Independent reconstruction of EPA EJScreen 2.3</h1>
     <p>
@@ -97,10 +234,64 @@
       <li><a href="https://github.com/P0RTSIDE/ejscreen-sql/blob/main/docs/validation_report.md">Validation report</a></li>
       <li><a href="https://github.com/P0RTSIDE/ejscreen-sql/blob/main/docs/data_sources.md">Data sources</a></li>
     </ul>
+
+    <section class="playground" aria-labelledby="playground-heading">
+      <h2 id="playground-heading">Try a sample query</h2>
+      <p class="notice">
+        Client-side playground over a <strong>250 block group sample</strong> from the
+        Harvard archive of the 2024 tables. This is a slice of the reconstruction reference,
+        not EPA EJScreen and not a full national API. There is no live database behind this page.
+      </p>
+
+      <p style="margin-bottom:0.5rem;font-size:0.9rem;color:var(--band);font-weight:600;">Example filters</p>
+      <div class="presets" role="group" aria-label="Example queries">
+        <button type="button" class="preset" data-preset="ca-pm25">California PM2.5</button>
+        <button type="button" class="preset" data-preset="alameda">Alameda County (06001)</button>
+        <button type="button" class="preset" data-preset="high-d2">Highest D2_PM25 in sample</button>
+      </div>
+
+      <form id="query-form" class="filters" autocomplete="off">
+        <label>
+          GEOID prefix
+          <input id="geoid-prefix" name="geoid" type="text" inputmode="numeric" placeholder="e.g. 06 or 06001" maxlength="12" />
+        </label>
+        <label>
+          State
+          <select id="state" name="state">
+            <option value="">Any in sample</option>
+          </select>
+        </label>
+        <label>
+          County FIPS
+          <input id="county" name="county" type="text" inputmode="numeric" placeholder="e.g. 06001" maxlength="5" />
+        </label>
+        <label>
+          Indicator column
+          <select id="indicator" name="indicator">
+            <option value="">All columns</option>
+          </select>
+        </label>
+      </form>
+
+      <div class="run-row">
+        <button type="button" class="run" id="run">Run</button>
+        <p class="status" id="status" role="status" aria-live="polite"></p>
+      </div>
+
+      <div class="results-wrap" id="results-wrap">
+        <p class="empty" id="empty">Load the sample, then run a filter.</p>
+        <table id="results" hidden>
+          <thead></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </section>
+
     <footer>
       Formulas follow EPA EJScreen Technical Documentation for Version 2.3 (July 31, 2024).
       Reference tables: Harvard Dataverse DOI 10.7910/DVN/RLR5AX.
     </footer>
   </main>
+  <script src="playground.js" defer></script>
 </body>
 </html>

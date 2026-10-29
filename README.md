@@ -108,6 +108,10 @@ make all
 
 `site/` is a minimal static page that links to the GitHub docs. The root `vercel.json` forces a static deploy of `site/` (Framework Preset Other, no Python runtime), so a Dashboard Root Directory override is optional. If you set one anyway, use `site`. No build step is required.
 
+### Try a sample query
+
+The docs site includes a client-side playground over 250 block groups from the Harvard 2024 archive (not EPA EJScreen and not a national API). Open the deployed site or `site/index.html`, pick a preset or filter by GEOID prefix, state, county FIPS, or indicator, and run.
+
 ## Known limitations
 
 The technical documentation does not state a rounding rule. Values are computed in full precision, so a published field stored at 15 decimal places is not always bit identical to the rebuilt double.
