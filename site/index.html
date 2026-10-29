@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>EJScreen SQL reconstruction</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;600&family=IBM+Plex+Serif:wght@600&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --ink: #14201a;
+      --muted: #3d4f45;
+      --paper: #eef3ef;
+      --band: #1f3d32;
+      --accent: #c45c26;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "IBM Plex Sans", sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(1200px 600px at 10% -10%, #d7e6dc 0%, transparent 55%),
+        radial-gradient(900px 500px at 100% 0%, #f3e4d8 0%, transparent 50%),
+        var(--paper);
+      line-height: 1.55;
+    }
+    main {
+      max-width: 42rem;
+      margin: 0 auto;
+      padding: 4.5rem 1.25rem 5rem;
+    }
+    .brand {
+      font-family: "IBM Plex Serif", serif;
+      font-size: clamp(2rem, 5vw, 2.75rem);
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      margin: 0 0 0.75rem;
+      color: var(--band);
+    }
+    h1 {
+      font-size: 1.15rem;
+      font-weight: 600;
+      margin: 0 0 0.75rem;
+    }
+    p { margin: 0 0 1rem; color: var(--muted); }
+    .cta {
+      display: inline-flex;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+      margin: 1.5rem 0 2.25rem;
+    }
+    a.button {
+      display: inline-block;
+      padding: 0.7rem 1rem;
+      background: var(--band);
+      color: #f7faf8;
+      text-decoration: none;
+      font-weight: 600;
+    }
+    a.button.secondary {
+      background: transparent;
+      color: var(--band);
+      outline: 1px solid var(--band);
+    }
+    ul {
+      padding-left: 1.1rem;
+      margin: 0;
+      color: var(--muted);
+    }
+    li { margin: 0.35rem 0; }
+    li a { color: var(--accent); }
+    footer {
+      margin-top: 2.5rem;
+      font-size: 0.9rem;
+      color: var(--muted);
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <p class="brand">EJScreen SQL</p>
+    <h1>Independent reconstruction of EPA EJScreen 2.3</h1>
+    <p>
+      This project rebuilds demographic indexes, percentiles, and EJ indexes in SQL
+      from the archived 2024 block group tables, and compares them with the published scores.
+      It is not affiliated with EPA.
+    </p>
+    <div class="cta">
+      <a class="button" href="https://github.com/P0RTSIDE/ejscreen-sql">View on GitHub</a>
+      <a class="button secondary" href="https://github.com/P0RTSIDE/ejscreen-sql/blob/main/docs/publish-disclaimer.md">Read the disclaimer</a>
+    </div>
+    <ul>
+      <li><a href="https://github.com/P0RTSIDE/ejscreen-sql/blob/main/docs/methodology.md">Methodology</a></li>
+      <li><a href="https://github.com/P0RTSIDE/ejscreen-sql/blob/main/docs/assumptions.md">Assumptions</a></li>
+      <li><a href="https://github.com/P0RTSIDE/ejscreen-sql/blob/main/docs/validation_report.md">Validation report</a></li>
+      <li><a href="https://github.com/P0RTSIDE/ejscreen-sql/blob/main/docs/data_sources.md">Data sources</a></li>
+    </ul>
+    <footer>
+      Formulas follow EPA EJScreen Technical Documentation for Version 2.3 (July 31, 2024).
+      Reference tables: Harvard Dataverse DOI 10.7910/DVN/RLR5AX.
+    </footer>
+  </main>
+</body>
+</html>

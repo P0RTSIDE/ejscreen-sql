@@ -1,0 +1,33 @@
+# Local secrets and env
+.env
+!.env.example
+
+# Local workspace / agent scratch (not part of the public rebuild)
+notes.md
+internal/
+inbox/
+artifacts/
+media/
+preferences.md
+
+# Downloaded reference and Census extracts (never commit)
+data/**
+!data/reference/
+!data/reference/README.md
+!data/census/
+!data/census/README.md
+**/HPMS*
+**/*.gdb*
+**/*.zip
+**/*.zip.part*
+
+# Postgres and Python
+postgres-data/
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+*.egg-info/
+.python-version
+.DS_Store
