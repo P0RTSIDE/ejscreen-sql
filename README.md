@@ -110,7 +110,7 @@ make all
 
 ### Try a sample query
 
-The docs site includes a client-side playground over 250 block groups from the Harvard 2024 archive (not EPA EJScreen and not a national API). Open the deployed site or `site/index.html`, pick a preset or filter by GEOID prefix, state, county FIPS, or indicator, and run.
+The docs site includes a client-side playground over 250 block groups from the Harvard 2024 archive (not EPA EJScreen and not a national API). Open the deployed site or `site/index.html`. **Simple filters** (default) uses plain-language justice topics and sample percentiles, with no SQL box. **Advanced** keeps GEOID, state, county, and indicator column tools. Values are from the reconstruction sample; "near" means a high proximity or percentile-style score in that sample, not a live EPA distance or custom mile radius.
 
 ## Known limitations
 

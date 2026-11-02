@@ -213,6 +213,81 @@
       color: var(--muted);
       padding: 0.75rem 0;
     }
+    .mode-toggle {
+      display: inline-flex;
+      margin: 0 0 1.25rem;
+      border: 1px solid var(--band);
+    }
+    .mode-toggle button {
+      background: transparent;
+      border: none;
+      color: var(--band);
+      padding: 0.45rem 0.85rem;
+      font-family: inherit;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s ease, color 0.2s ease;
+    }
+    .mode-toggle button + button {
+      border-left: 1px solid var(--band);
+    }
+    .mode-toggle button[aria-pressed="true"] {
+      background: var(--band);
+      color: #f7faf8;
+    }
+    .mode-toggle button:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 2px;
+    }
+    .mode-panel[hidden] { display: none; }
+    .simple-note {
+      margin: 0 0 1rem;
+      font-size: 0.9rem;
+      color: var(--muted);
+    }
+    .justice-list {
+      list-style: none;
+      padding: 0;
+      margin: 0 0 1rem;
+      display: grid;
+      gap: 0.55rem;
+    }
+    .justice-list li label.check {
+      flex-direction: row;
+      align-items: flex-start;
+      gap: 0.55rem;
+      font-weight: 400;
+      color: var(--ink);
+      cursor: pointer;
+    }
+    .justice-list input[type="checkbox"] {
+      width: auto;
+      margin-top: 0.2rem;
+      accent-color: var(--band);
+      flex-shrink: 0;
+    }
+    .justice-list .hint {
+      display: block;
+      font-size: 0.8rem;
+      color: var(--muted);
+      font-weight: 400;
+      margin-top: 0.15rem;
+    }
+    .justice-list .title {
+      font-weight: 600;
+      color: var(--band);
+      font-size: 0.9rem;
+    }
+    .simple-controls {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 0.85rem 1rem;
+      margin: 0 0 1rem;
+    }
+    @media (max-width: 640px) {
+      .simple-controls { grid-template-columns: 1fr; }
+    }
   </style>
 </head>
 <body>
@@ -241,45 +316,133 @@
         Client-side playground over a <strong>250 block group sample</strong> from the
         Harvard archive of the 2024 tables. This is a slice of the reconstruction reference,
         not EPA EJScreen and not a full national API. There is no live database behind this page.
+        Values are not live EPA distances. In Simple filters, "near" means a high proximity or
+        percentile-style score in this sample, not a custom mile radius.
       </p>
 
-      <p style="margin-bottom:0.5rem;font-size:0.9rem;color:var(--band);font-weight:600;">Example filters</p>
-      <div class="presets" role="group" aria-label="Example queries">
-        <button type="button" class="preset" data-preset="ca-pm25">California PM2.5</button>
-        <button type="button" class="preset" data-preset="alameda">Alameda County (06001)</button>
-        <button type="button" class="preset" data-preset="high-d2">Highest D2_PM25 in sample</button>
+      <div class="mode-toggle" role="group" aria-label="Query mode">
+        <button type="button" id="mode-simple" aria-pressed="true">Simple filters</button>
+        <button type="button" id="mode-advanced" aria-pressed="false">Advanced</button>
       </div>
 
-      <form id="query-form" class="filters" autocomplete="off">
-        <label>
-          GEOID prefix
-          <input id="geoid-prefix" name="geoid" type="text" inputmode="numeric" placeholder="e.g. 06 or 06001" maxlength="12" />
-        </label>
-        <label>
-          State
-          <select id="state" name="state">
-            <option value="">Any in sample</option>
-          </select>
-        </label>
-        <label>
-          County FIPS
-          <input id="county" name="county" type="text" inputmode="numeric" placeholder="e.g. 06001" maxlength="5" />
-        </label>
-        <label>
-          Indicator column
-          <select id="indicator" name="indicator">
-            <option value="">All columns</option>
-          </select>
-        </label>
-      </form>
+      <div id="panel-simple" class="mode-panel">
+        <p class="simple-note">
+          Pick everyday topics. Thresholds are measured inside this reconstruction sample only.
+          RMP facility proximity, linguistic isolation, and age shares are not in this extract,
+          so those topics are omitted here.
+        </p>
+
+        <p style="margin-bottom:0.5rem;font-size:0.9rem;color:var(--band);font-weight:600;">Example stories</p>
+        <div class="presets" role="group" aria-label="Example justice stories">
+          <button type="button" class="preset" data-story="highways-lowinc">Near highways + higher low-income share</button>
+          <button type="button" class="preset" data-story="ca-pm25">High PM2.5 in California sample</button>
+          <button type="button" class="preset" data-story="superfund">Near Superfund sites</button>
+        </div>
+
+        <ul class="justice-list" id="justice-filters">
+          <li>
+            <label class="check">
+              <input type="checkbox" name="jf" value="traffic" />
+              <span>
+                <span class="title">Near major roads / traffic</span>
+                <span class="hint">High traffic proximity and volume score (PTRAF)</span>
+              </span>
+            </label>
+          </li>
+          <li>
+            <label class="check">
+              <input type="checkbox" name="jf" value="superfund" />
+              <span>
+                <span class="title">Near Superfund / hazardous sites</span>
+                <span class="hint">High Superfund or hazardous-waste proximity (PNPL / PTSDF)</span>
+              </span>
+            </label>
+          </li>
+          <li>
+            <label class="check">
+              <input type="checkbox" name="jf" value="air" />
+              <span>
+                <span class="title">High particulate matter / ozone / diesel</span>
+                <span class="hint">Elevated PM2.5, ozone, or diesel PM in the sample</span>
+              </span>
+            </label>
+          </li>
+          <li>
+            <label class="check">
+              <input type="checkbox" name="jf" value="demographics" />
+              <span>
+                <span class="title">Higher share of people of color / low income</span>
+                <span class="hint">People of color or low-income share above the sample cutoff</span>
+              </span>
+            </label>
+          </li>
+          <li>
+            <label class="check">
+              <input type="checkbox" name="jf" value="ejindex" />
+              <span>
+                <span class="title">Combined EJ index high</span>
+                <span class="hint">Two-factor or five-factor PM2.5 EJ index (D2_PM25 / D5_PM25)</span>
+              </span>
+            </label>
+          </li>
+        </ul>
+
+        <div class="simple-controls">
+          <label>
+            Threshold in this sample
+            <select id="simple-threshold" name="threshold">
+              <option value="p80">Above 80th percentile</option>
+              <option value="p75">Highest quartile (75th+)</option>
+            </select>
+          </label>
+          <label>
+            Place (state in sample)
+            <select id="simple-state" name="simple-state">
+              <option value="">Any in sample</option>
+            </select>
+          </label>
+        </div>
+      </div>
+
+      <div id="panel-advanced" class="mode-panel" hidden>
+        <p style="margin-bottom:0.5rem;font-size:0.9rem;color:var(--band);font-weight:600;">Example filters</p>
+        <div class="presets" role="group" aria-label="Example advanced queries">
+          <button type="button" class="preset" data-preset="ca-pm25">California PM2.5</button>
+          <button type="button" class="preset" data-preset="alameda">Alameda County (06001)</button>
+          <button type="button" class="preset" data-preset="high-d2">Highest D2_PM25 in sample</button>
+        </div>
+
+        <form id="query-form" class="filters" autocomplete="off">
+          <label>
+            GEOID prefix
+            <input id="geoid-prefix" name="geoid" type="text" inputmode="numeric" placeholder="e.g. 06 or 06001" maxlength="12" />
+          </label>
+          <label>
+            State
+            <select id="state" name="state">
+              <option value="">Any in sample</option>
+            </select>
+          </label>
+          <label>
+            County FIPS
+            <input id="county" name="county" type="text" inputmode="numeric" placeholder="e.g. 06001" maxlength="5" />
+          </label>
+          <label>
+            Indicator column
+            <select id="indicator" name="indicator">
+              <option value="">All columns</option>
+            </select>
+          </label>
+        </form>
+      </div>
 
       <div class="run-row">
-        <button type="button" class="run" id="run">Run</button>
+        <button type="button" class="run" id="run">Show matching places</button>
         <p class="status" id="status" role="status" aria-live="polite"></p>
       </div>
 
       <div class="results-wrap" id="results-wrap">
-        <p class="empty" id="empty">Load the sample, then run a filter.</p>
+        <p class="empty" id="empty">Load the sample, then choose a filter.</p>
         <table id="results" hidden>
           <thead></thead>
           <tbody></tbody>
