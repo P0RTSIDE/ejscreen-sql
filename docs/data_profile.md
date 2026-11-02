@@ -1,6 +1,6 @@
 # EJScreen 2024 reference profile
 
-Every count, minimum, and maximum below comes from a query against the loaded Postgres tables.
+Counts, minima, and maxima from the loaded Postgres tables for the Harvard Dataverse EJScreen 2024 block group extracts. This profile describes the reference inputs, not the rebuilt scores. Match rates are in [`docs/validation_report.md`](validation_report.md).
 
 ## Files loaded
 

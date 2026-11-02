@@ -1,6 +1,8 @@
 # EJScreen version 2.3 methodology
 
-Authority: U.S. Environmental Protection Agency, *EJScreen Technical Documentation for Version 2.3*, revised July 31, 2024. Local copy: `docs/sources/ejscreen-tech-doc-version-2-3.pdf`. Printed page numbers match the PDF page numbers. Quotations below are from that PDF.
+This note records the formulas used by the SQL reconstruction. Authority: U.S. Environmental Protection Agency, *EJScreen Technical Documentation for Version 2.3*, revised July 31, 2024. Local copy: `docs/sources/ejscreen-tech-doc-version-2-3.pdf`. Printed page numbers match the PDF page numbers. Quotations below are from that PDF.
+
+Where EPA pages disagree, or the tech doc is silent, choices are recorded in [`docs/assumptions.md`](assumptions.md). Validation results are in [`docs/validation_report.md`](validation_report.md).
 
 EJScreen combines environmental and socioeconomic indicators on Census block groups. It publishes a two-factor demographic index, a five-factor supplemental demographic index, 13 EJ indexes, and 13 supplemental indexes (p. 1, pp. 31 to 39).
 

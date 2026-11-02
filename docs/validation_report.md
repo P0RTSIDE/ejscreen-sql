@@ -1,35 +1,49 @@
 # EJScreen version 2.3 validation
 
-The sections through the pilot area are Tier 1. They compare indexes built from the published indicator values. The Tier 2 section rebuilds the demographic indicators from the American Community Survey and compares those columns with the same Harvard extract. This report compares the SQL reconstruction with the Harvard Dataverse EJScreen 2024 block group extracts. Match rates are reported checks. A low match rate does not stop the build. The build stops if an assertion fails. Assertions cover id uniqueness, 12 character ids, population, percentile bounds, the non-negative shift, and the index product. The tech doc states no maximum of 100 for an EJ index or supplemental index, so no such maximum is asserted.
+This report compares the SQL reconstruction with the Harvard Dataverse EJScreen 2024 block group extracts (DOI 10.7910/DVN/RLR5AX).
+
+- **Tier 1** (through the pilot area): indexes built from the published environmental and demographic indicator values.
+- **Tier 2**: demographic indicators rebuilt from the American Community Survey, compared with the same extract.
+- **Tier 3**: lead paint and proximity scores from public environmental inputs.
+
+Match rates are reported checks. A low match rate does not stop the build. The build stops if an assertion fails. Assertions cover id uniqueness, 12-character ids, population, percentile bounds, the non-negative shift, and the index product. The tech doc states no maximum of 100 for an EJ index or supplemental index, so no such maximum is asserted.
+
+For open gaps that need non-public vintages (hazardous waste, RMP, drinking water) and the remaining life-expectancy disagreement, see [`docs/publish-disclaimer.md`](publish-disclaimer.md).
 
 ## Thresholds
 
 These thresholds are fixed in `sql/validation/metrics.sql` before the comparison runs.
 
-Continuous values pass the tolerance check when the absolute difference is at most 1e-8 on at least 99 percent of rows where both sides are present. The reference stores those fields at 15 decimal places. 1e-8 is above ordinary double precision residue and below a one point percentile error.
+Continuous values pass the tolerance check when the absolute difference is at most 1e-8 on at least 99 percent of rows where both sides are present. The reference stores those fields at 15 decimal places. 1e-8 is above ordinary double-precision residue and below a one-point percentile error.
 
 Percentile values are integers. Their tolerance is 0, so the tolerance check is the exact check. The pass bar is 99 percent.
 
 Null agreement passes when at least 99.9 percent of rows agree on whether the value is null.
 
-Exact equality is double precision equality. Spearman correlation is the Pearson correlation of `rank()` values, and ties share the minimum rank.
+Exact equality is double-precision equality. Spearman correlation is the Pearson correlation of `rank()` values, and ties share the minimum rank.
 
 ## Result
 
-Reported checks passed: 391. Reported checks failed: 85.
-Exact checks: 100 passed, 58 failed.
-Tolerance checks: 158 passed, 0 failed.
-Null agreement checks: 131 passed, 27 failed.
-Geographic id alignment: pass.
-Tech doc block group count of 242,336: pass.
+| Check family | Passed | Failed |
+| --- | ---: | ---: |
+| Reported checks (all) | 391 | 85 |
+| Exact | 100 | 58 |
+| Tolerance | 158 | 0 |
+| Null agreement | 131 | 27 |
+| Geographic id alignment | pass |  |
+| Tech doc block group count (242,336) | pass |  |
+
+The 58 exact failures are continuous index columns whose gaps are double-precision residue, all far below 1e-8. Pearson and Spearman correlations are 1. The 27 null failures are state-file columns on island-territory rows (see below).
 
 Assertions ran before this report was written. A failed assertion stops the run and does not produce this file.
 
 ## Universe
 
-Total rows: 243022.
-States, the District of Columbia, and Puerto Rico: 242336.
-Island territories: 686.
+| Slice | Rows |
+| --- | ---: |
+| Total | 243,022 |
+| States, District of Columbia, and Puerto Rico | 242,336 |
+| Island territories (place and estate records) | 686 |
 
 ## Geographic ids
 
@@ -37,84 +51,103 @@ No source id is missing from either side. Unmatched count is 0 for the national 
 
 ## Columns that are not uniform
 
-national_file D2_DSLPM: exact 0.014274, tolerance 1.000000, null disagreements 0.
-national_file D2_DWATER: exact 0.735878, tolerance 1.000000, null disagreements 0.
-national_file D2_LDPNT: exact 0.153704, tolerance 1.000000, null disagreements 0.
-national_file D2_NO2: exact 0.017397, tolerance 1.000000, null disagreements 0.
-national_file D2_OZONE: exact 0.019576, tolerance 1.000000, null disagreements 0.
-national_file D2_PM25: exact 0.019560, tolerance 1.000000, null disagreements 0.
-national_file D2_PNPL: exact 0.563664, tolerance 1.000000, null disagreements 0.
-national_file D2_PRMP: exact 0.287031, tolerance 1.000000, null disagreements 0.
-national_file D2_PTRAF: exact 0.018274, tolerance 1.000000, null disagreements 0.
-national_file D2_PTSDF: exact 0.158872, tolerance 1.000000, null disagreements 0.
-national_file D2_PWDIS: exact 0.080985, tolerance 1.000000, null disagreements 0.
-national_file D2_RSEI_AIR: exact 0.017278, tolerance 1.000000, null disagreements 0.
-national_file D2_UST: exact 0.275466, tolerance 1.000000, null disagreements 0.
-national_file D5_DSLPM: exact 0.010040, tolerance 1.000000, null disagreements 0.
-national_file D5_DWATER: exact 0.734807, tolerance 1.000000, null disagreements 0.
-national_file D5_LDPNT: exact 0.153048, tolerance 1.000000, null disagreements 0.
-national_file D5_NO2: exact 0.010037, tolerance 1.000000, null disagreements 0.
-national_file D5_OZONE: exact 0.010034, tolerance 1.000000, null disagreements 0.
-national_file D5_PM25: exact 0.010025, tolerance 1.000000, null disagreements 0.
-national_file D5_PNPL: exact 0.561349, tolerance 1.000000, null disagreements 0.
-national_file D5_PRMP: exact 0.283826, tolerance 1.000000, null disagreements 0.
-national_file D5_PTRAF: exact 0.014028, tolerance 1.000000, null disagreements 0.
-national_file D5_PTSDF: exact 0.154925, tolerance 1.000000, null disagreements 0.
-national_file D5_PWDIS: exact 0.076901, tolerance 1.000000, null disagreements 0.
-national_file D5_RSEI_AIR: exact 0.010033, tolerance 1.000000, null disagreements 0.
-national_file D5_UST: exact 0.269779, tolerance 1.000000, null disagreements 0.
-national_file DEMOGIDX_2: exact 0.009990, tolerance 1.000000, null disagreements 0.
-national_file DEMOGIDX_2ST: exact 0.039140, tolerance 1.000000, null disagreements 0.
-national_file DEMOGIDX_5: exact 0.000033, tolerance 1.000000, null disagreements 0.
-national_file DEMOGIDX_5ST: exact 0.003784, tolerance 1.000000, null disagreements 0.
-state_file D2_DSLPM: exact 0.052317, tolerance 1.000000, null disagreements 0.
-state_file D2_DWATER: exact 0.746782, tolerance 1.000000, null disagreements 0.
-state_file D2_LDPNT: exact 0.184694, tolerance 1.000000, null disagreements 679.
-state_file D2_NO2: exact 0.055071, tolerance 1.000000, null disagreements 0.
-state_file D2_OZONE: exact 0.057877, tolerance 1.000000, null disagreements 0.
-state_file D2_PM25: exact 0.057781, tolerance 1.000000, null disagreements 0.
-state_file D2_PNPL: exact 0.578124, tolerance 1.000000, null disagreements 440.
-state_file D2_PRMP: exact 0.315369, tolerance 1.000000, null disagreements 440.
-state_file D2_PTRAF: exact 0.059317, tolerance 1.000000, null disagreements 0.
-state_file D2_PTSDF: exact 0.190290, tolerance 1.000000, null disagreements 440.
-state_file D2_PWDIS: exact 0.117585, tolerance 1.000000, null disagreements 0.
-state_file D2_RSEI_AIR: exact 0.059654, tolerance 1.000000, null disagreements 679.
-state_file D2_UST: exact 0.306825, tolerance 1.000000, null disagreements 679.
-state_file D5_DSLPM: exact 0.013966, tolerance 1.000000, null disagreements 0.
-state_file D5_DWATER: exact 0.736326, tolerance 1.000000, null disagreements 0.
-state_file D5_LDPNT: exact 0.156361, tolerance 1.000000, null disagreements 0.
-state_file D5_NO2: exact 0.014212, tolerance 1.000000, null disagreements 0.
-state_file D5_OZONE: exact 0.013644, tolerance 1.000000, null disagreements 0.
-state_file D5_PM25: exact 0.013594, tolerance 1.000000, null disagreements 0.
-state_file D5_PNPL: exact 0.563104, tolerance 1.000000, null disagreements 0.
-state_file D5_PRMP: exact 0.286259, tolerance 1.000000, null disagreements 0.
-state_file D5_PTRAF: exact 0.020698, tolerance 1.000000, null disagreements 0.
-state_file D5_PTSDF: exact 0.158224, tolerance 1.000000, null disagreements 0.
-state_file D5_PWDIS: exact 0.081992, tolerance 1.000000, null disagreements 0.
-state_file D5_RSEI_AIR: exact 0.018474, tolerance 1.000000, null disagreements 0.
-state_file D5_UST: exact 0.273129, tolerance 1.000000, null disagreements 0.
-state_file DEMOGIDX_2: exact 0.039214, tolerance 1.000000, null disagreements 679.
-state_file DEMOGIDX_5: exact 0.003784, tolerance 1.000000, null disagreements 0.
-state_file P_D2_LDPNT: exact 1.000000, tolerance 1.000000, null disagreements 679.
-state_file P_D2_PNPL: exact 1.000000, tolerance 1.000000, null disagreements 440.
-state_file P_D2_PRMP: exact 1.000000, tolerance 1.000000, null disagreements 440.
-state_file P_D2_PTSDF: exact 1.000000, tolerance 1.000000, null disagreements 440.
-state_file P_D2_RSEI_AIR: exact 1.000000, tolerance 1.000000, null disagreements 679.
-state_file P_D2_UST: exact 1.000000, tolerance 1.000000, null disagreements 679.
-state_file P_DEMOGIDX_2: exact 1.000000, tolerance 1.000000, null disagreements 679.
-state_file P_LDPNT: exact 1.000000, tolerance 1.000000, null disagreements 679.
-state_file P_LESSHSPCT: exact 1.000000, tolerance 1.000000, null disagreements 679.
-state_file P_LINGISOPCT: exact 1.000000, tolerance 1.000000, null disagreements 679.
-state_file P_LOWINCPCT: exact 1.000000, tolerance 1.000000, null disagreements 679.
-state_file P_OVER64PCT: exact 1.000000, tolerance 1.000000, null disagreements 685.
-state_file P_PEOPCOLORPCT: exact 1.000000, tolerance 1.000000, null disagreements 685.
-state_file P_PNPL: exact 1.000000, tolerance 1.000000, null disagreements 446.
-state_file P_PRMP: exact 1.000000, tolerance 1.000000, null disagreements 446.
-state_file P_PTSDF: exact 1.000000, tolerance 1.000000, null disagreements 446.
-state_file P_RSEI_AIR: exact 1.000000, tolerance 1.000000, null disagreements 685.
-state_file P_UNDER5PCT: exact 1.000000, tolerance 1.000000, null disagreements 685.
-state_file P_UNEMPPCT: exact 1.000000, tolerance 1.000000, null disagreements 679.
-state_file P_UST: exact 1.000000, tolerance 1.000000, null disagreements 685.
+“Not uniform” means a column failed at least one Tier 1 reported check: exact equality under the 99% bar, tolerance under the 99% bar, or null agreement under the 99.9% bar. The tables below list every such column for the national file and the state file.
+
+### How to read these rates
+
+- **Exact match rate** is the share of both-present rows where rebuilt equals published as double-precision numbers. Continuous indexes often show low exact rates because tiny floating-point differences remain after the formula. That alone is not a substantive gap when the tolerance rate is 1.0.
+- **Tolerance match rate** is the share within absolute difference 1e-8 (or exact for integer percentiles). Every continuous column in this list has tolerance rate **1.0**, so values agree for practical purposes where both sides are present.
+- **Null disagreements** count rows where one side is null and the other is not. National-file columns in this list have zero null disagreements. State-file null disagreements cluster on island-territory rows (about 440, 446, 679, or 685 rows) whose inputs are blank in the national extract while the state extract still carries values. Staging uses the national extract only, so the rebuild stays null there.
+
+Percentile columns that appear only under the state file (exact rate 1.0, nonzero null disagreements) fail null agreement only. Where both sides have a value, the integers match.
+
+### National file
+
+| Column | Exact match rate | Tolerance match rate | Null disagreements |
+| --- | ---: | ---: | ---: |
+| D2_DSLPM | 0.014274 | 1.000000 | 0 |
+| D2_DWATER | 0.735878 | 1.000000 | 0 |
+| D2_LDPNT | 0.153704 | 1.000000 | 0 |
+| D2_NO2 | 0.017397 | 1.000000 | 0 |
+| D2_OZONE | 0.019576 | 1.000000 | 0 |
+| D2_PM25 | 0.019560 | 1.000000 | 0 |
+| D2_PNPL | 0.563664 | 1.000000 | 0 |
+| D2_PRMP | 0.287031 | 1.000000 | 0 |
+| D2_PTRAF | 0.018274 | 1.000000 | 0 |
+| D2_PTSDF | 0.158872 | 1.000000 | 0 |
+| D2_PWDIS | 0.080985 | 1.000000 | 0 |
+| D2_RSEI_AIR | 0.017278 | 1.000000 | 0 |
+| D2_UST | 0.275466 | 1.000000 | 0 |
+| D5_DSLPM | 0.010040 | 1.000000 | 0 |
+| D5_DWATER | 0.734807 | 1.000000 | 0 |
+| D5_LDPNT | 0.153048 | 1.000000 | 0 |
+| D5_NO2 | 0.010037 | 1.000000 | 0 |
+| D5_OZONE | 0.010034 | 1.000000 | 0 |
+| D5_PM25 | 0.010025 | 1.000000 | 0 |
+| D5_PNPL | 0.561349 | 1.000000 | 0 |
+| D5_PRMP | 0.283826 | 1.000000 | 0 |
+| D5_PTRAF | 0.014028 | 1.000000 | 0 |
+| D5_PTSDF | 0.154925 | 1.000000 | 0 |
+| D5_PWDIS | 0.076901 | 1.000000 | 0 |
+| D5_RSEI_AIR | 0.010033 | 1.000000 | 0 |
+| D5_UST | 0.269779 | 1.000000 | 0 |
+| DEMOGIDX_2 | 0.009990 | 1.000000 | 0 |
+| DEMOGIDX_2ST | 0.039140 | 1.000000 | 0 |
+| DEMOGIDX_5 | 0.000033 | 1.000000 | 0 |
+| DEMOGIDX_5ST | 0.003784 | 1.000000 | 0 |
+
+### State file
+
+| Column | Exact match rate | Tolerance match rate | Null disagreements |
+| --- | ---: | ---: | ---: |
+| D2_DSLPM | 0.052317 | 1.000000 | 0 |
+| D2_DWATER | 0.746782 | 1.000000 | 0 |
+| D2_LDPNT | 0.184694 | 1.000000 | 679 |
+| D2_NO2 | 0.055071 | 1.000000 | 0 |
+| D2_OZONE | 0.057877 | 1.000000 | 0 |
+| D2_PM25 | 0.057781 | 1.000000 | 0 |
+| D2_PNPL | 0.578124 | 1.000000 | 440 |
+| D2_PRMP | 0.315369 | 1.000000 | 440 |
+| D2_PTRAF | 0.059317 | 1.000000 | 0 |
+| D2_PTSDF | 0.190290 | 1.000000 | 440 |
+| D2_PWDIS | 0.117585 | 1.000000 | 0 |
+| D2_RSEI_AIR | 0.059654 | 1.000000 | 679 |
+| D2_UST | 0.306825 | 1.000000 | 679 |
+| D5_DSLPM | 0.013966 | 1.000000 | 0 |
+| D5_DWATER | 0.736326 | 1.000000 | 0 |
+| D5_LDPNT | 0.156361 | 1.000000 | 0 |
+| D5_NO2 | 0.014212 | 1.000000 | 0 |
+| D5_OZONE | 0.013644 | 1.000000 | 0 |
+| D5_PM25 | 0.013594 | 1.000000 | 0 |
+| D5_PNPL | 0.563104 | 1.000000 | 0 |
+| D5_PRMP | 0.286259 | 1.000000 | 0 |
+| D5_PTRAF | 0.020698 | 1.000000 | 0 |
+| D5_PTSDF | 0.158224 | 1.000000 | 0 |
+| D5_PWDIS | 0.081992 | 1.000000 | 0 |
+| D5_RSEI_AIR | 0.018474 | 1.000000 | 0 |
+| D5_UST | 0.273129 | 1.000000 | 0 |
+| DEMOGIDX_2 | 0.039214 | 1.000000 | 679 |
+| DEMOGIDX_5 | 0.003784 | 1.000000 | 0 |
+| P_D2_LDPNT | 1.000000 | 1.000000 | 679 |
+| P_D2_PNPL | 1.000000 | 1.000000 | 440 |
+| P_D2_PRMP | 1.000000 | 1.000000 | 440 |
+| P_D2_PTSDF | 1.000000 | 1.000000 | 440 |
+| P_D2_RSEI_AIR | 1.000000 | 1.000000 | 679 |
+| P_D2_UST | 1.000000 | 1.000000 | 679 |
+| P_DEMOGIDX_2 | 1.000000 | 1.000000 | 679 |
+| P_LDPNT | 1.000000 | 1.000000 | 679 |
+| P_LESSHSPCT | 1.000000 | 1.000000 | 679 |
+| P_LINGISOPCT | 1.000000 | 1.000000 | 679 |
+| P_LOWINCPCT | 1.000000 | 1.000000 | 679 |
+| P_OVER64PCT | 1.000000 | 1.000000 | 685 |
+| P_PEOPCOLORPCT | 1.000000 | 1.000000 | 685 |
+| P_PNPL | 1.000000 | 1.000000 | 446 |
+| P_PRMP | 1.000000 | 1.000000 | 446 |
+| P_PTSDF | 1.000000 | 1.000000 | 446 |
+| P_RSEI_AIR | 1.000000 | 1.000000 | 685 |
+| P_UNDER5PCT | 1.000000 | 1.000000 | 685 |
+| P_UNEMPPCT | 1.000000 | 1.000000 | 679 |
+| P_UST | 1.000000 | 1.000000 | 685 |
 
 ## All columns
 
@@ -769,7 +802,7 @@ NCHS. Live `https://www.cdc.gov/nchs/nvss/usaleep/usaleep.html` returned HTTP 40
 
 Thresholds are fixed in `sql/validation/tier3_metrics.sql` and are the same bars as Tier 1 and Tier 2. Continuous tolerance is an absolute difference of at most 1e-8 on at least 99 percent of rows where both values are present. Exact equality uses the same 99 percent bar. Null agreement passes at 99.9 percent. A low match rate is reported. The distance unit and the cap were not changed after the comparison.
 
-Traffic proximity uses the 2020 HPMS file geodatabase supplied for this run. The annual average daily traffic field is AADT. Distance is kilometers, from the inverse-distance equation on p. 48 and the traffic steps on pp. 50 to 51. Page 21 says AADT divided by distance in meters. That sentence was not used. The maximum score of 10 applies to distances under 0.1 km, and that capped inverse distance is then multiplied by AADT. The roads are interstates, other freeways and expressways, other principal arterials, and minor arterials in urban areas. Within each state, segments that share Route_ID and AADT contribute once, through the minimum distance to the group.
+Traffic proximity uses the 2020 HPMS file geodatabase. The annual average daily traffic field is AADT. Distance is kilometers, from the inverse-distance equation on p. 48 and the traffic steps on pp. 50 to 51. Page 21 says AADT divided by distance in meters. That sentence was not used. The maximum score of 10 applies to distances under 0.1 km, and that capped inverse distance is then multiplied by AADT. The roads are interstates, other freeways and expressways, other principal arterials, and minor arterials in urban areas. Within each state, segments that share Route_ID and AADT contribute once, through the minimum distance to the group.
 
 Tier 3 column checks passed: 0. Tier 3 column checks failed: 4.
 
@@ -952,7 +985,7 @@ PRMP. RMP facility proximity was rebuilt from the current public FRS RMP interes
 
 The file is `https://services.arcgis.com/cJ9YHowT8TU7DUyn/arcgis/rest/services/FRS_INTERESTS_RMP/FeatureServer/0`, downloaded 2026-10-28. Layer `dataLastEditDate` 2026-10-26 00:57:17 UTC. Features: 21855. Active: 21836. Blank status: 19. Scored after one point per `REGISTRY_ID` and dropping island territories: 21543. Block centroids are the same TIGER/Line 2020 geometric centroids and 2020 block populations used for Superfund and hazardous waste. This comparison is SQL on 242336 national rows. Both present: 240939. Both null: 1393. Rebuilt null where the reference has a value: 4. Reference null where the rebuild has a value: 0. Rows within 1e-8: 28797, tolerance rate 0.11951987847546475. Both positive: 171446. Positive-row median ratio 2.0939259982049303. Pearson 0.8337008027964584. Spearman 0.7898967031069142. Median absolute gap 0.456710985262113. The median ratio is not near 1, so the score was not kept.
 
-Scale diagnosis on 2026-10-29 (km and cap unchanged). Multiple PGM rows: 21855 unique `PGM_SYS_ID`, only 266 registries with more than one interest row; scoring already used one point per `REGISTRY_ID`. Co-located points: 70 shared coordinates to five decimals after that collapse (71 extras). Active definition: EPA March 2024 states 11740 regulated RMP facilities; FRS scored 21543 (ratio ≈ 1.835, same order as median ratio 2.09). FRS `LAST_REPORTED_DATE` / `UPDATE_DATE` are null on every interest row, so `ACTIVE_STATUS` does not implement the documented not-deregistered filter. No public active-only bulk list was found; no before/after keep. RMP stays not kept. PM 2.5 stays kept. Hazardous waste stays pinned. Drinking water stays not kept. Wastewater, Superfund, traffic, RSEI_AIR, life expectancy, 97.5, and the factor weights were left unchanged. Detail: `internal/rmp-diagnosis-notes.md`.
+Scale diagnosis on 2026-10-29 (km and cap unchanged). Multiple PGM rows: 21855 unique `PGM_SYS_ID`, only 266 registries with more than one interest row; scoring already used one point per `REGISTRY_ID`. Co-located points: 70 shared coordinates to five decimals after that collapse (71 extras). Active definition: EPA March 2024 states 11740 regulated RMP facilities; FRS scored 21543 (ratio ≈ 1.835, same order as median ratio 2.09). FRS `LAST_REPORTED_DATE` / `UPDATE_DATE` are null on every interest row, so `ACTIVE_STATUS` does not implement the documented not-deregistered filter. No public active-only bulk list was found. The RMP proximity score remains not kept.
 
 PM25. Particulate matter 2.5 was rebuilt from the public FAQSD 2020 daily fused tract file as the documented annual average, and the score was kept. The version 2.3 technical documentation names a 2020 OAQPS tract spreadsheet (monitor and CMAQ fusion, EPA-454/S-15-001), annual average in µg/m³, copied to child block groups and remapped from 2020 to 2022. `EJscreen.pm25_2020.csv` remains HTTP 404. Named FAQSD annual paths still return `FAILED` (7 bytes). The annual mean of the public daily fused file is the documented OAQPS product form (`AnnualMeanPM25` in the prior-year sibling). No weight or unit was retuned.
 
@@ -972,11 +1005,11 @@ The file is `https://ndownloader.figshare.com/files/26064350` (`2020_final_1km.t
 
 DWATER. Drinking water non-compliance was retried from public ECHO SDWA latest plus ORD CWS boundaries and was not kept. The version 2.3 technical documentation scores unresolved SDWA violations from 2019 Q4 through 2023 Q4 from EPA’s internal ETT (SDWIS 2023 Q4), weights them by severity and years out of compliance (10 / 5 / 1 plus year increments capped at 5 for health-based types), joins them to ORD CWS service areas, then population-weights intersecting blocks to the block group. The internal ETT extract is still not public. Severity weights were not invented.
 
-Public retry (2026-10-29). ECHO `SDWA_latest_downloads.zip` last-modified 2026-10-14, submission quarter 2026Q3, 15.55M enforcement rows, 3094207 unique CWS violations after PWSID+VIOLATION_ID dedupe. Printed tiers applied with `VIOLATION_CODE`, `VIOLATION_CATEGORY_CODE`, `IS_HEALTH_BASED_IND`, `CONTAMINANT_CODE`, `RULE_CODE`, noncompliance and RTC dates. `SEVERITY_IND_CNT` was not used (sparse; not the printed tier). ORD `PWS_Boundaries_Latest.zip` version 3.0 block crosswalk: 4464702 intersecting blocks. Reconstructed window 2019Q4–2023Q4 (open as of 2023-12-31): 58078 open violations, 11957 CWS with positive PWS score. Closest dated current window 2021Q4–2026Q3 (Unaddressed+Addressed as of 2026-09-30): 40170 open violations, 12655 CWS with positive PWS score.
+Public retry (2026-10-29). ECHO `SDWA_latest_downloads.zip` last-modified 2026-10-14, submission quarter 2026Q3, 15.55M enforcement rows, 3094207 unique CWS violations after PWSID+VIOLATION_ID dedupe. Printed tiers applied with `VIOLATION_CODE`, `VIOLATION_CATEGORY_CODE`, `IS_HEALTH_BASED_IND`, `CONTAMINANT_CODE`, `RULE_CODE`, noncompliance and RTC dates. `SEVERITY_IND_CNT` was not used (sparse; not the printed tier). ORD `PWS_Boundaries_Latest.zip` version 3.0 block crosswalk: 4464702 intersecting blocks. Reconstructed window 2019Q4 to 2023Q4 (open as of 2023-12-31): 58078 open violations, 11957 CWS with positive PWS score. Closest dated current window 2021Q4 to 2026Q3 (Unaddressed+Addressed as of 2026-09-30): 40170 open violations, 12655 CWS with positive PWS score.
 
-Harvard comparison (reconstructed 2019Q4–2023Q4, intersect-pop weights): both present 222081; both null 12304; both positive 33877; positive-row median ratio 1.0; Pearson 0.13753045262732258; Spearman 0.6355451427634835. Current 2021Q4–2026Q3: both positive 31318; median ratio 1.0; Pearson 0.155387180706439. Rebuild max about 325 versus published max 899. The positive-row median ratio is near 1 and Pearson is reported, but Pearson is far from identity, so the score was not kept. No weight was retuned. PM 2.5 stays kept. Hazardous waste stays pinned. RMP stays not kept. NO2, DSLPM, ozone, and UST stay kept. Wastewater, Superfund, traffic, RSEI_AIR, life expectancy, 97.5, and the factor weights were left unchanged.
+Harvard comparison (reconstructed 2019Q4 to 2023Q4, intersect-pop weights): both present 222081; both null 12304; both positive 33877; positive-row median ratio 1.0; Pearson 0.13753045262732258; Spearman 0.6355451427634835. Current 2021Q4 to 2026Q3: both positive 31318; median ratio 1.0; Pearson 0.155387180706439. Rebuild max about 325 versus published max 899. The positive-row median ratio is near 1 and Pearson is reported, but Pearson is far from identity, so the score was not kept. No weight was retuned. PM 2.5 stays kept. Hazardous waste stays pinned. RMP stays not kept. NO2, DSLPM, ozone, and UST stay kept. Wastewater, Superfund, traffic, RSEI_AIR, life expectancy, 97.5, and the factor weights were left unchanged.
 
 UST. Underground storage tanks and leaking UST were rebuilt from the public UST Finder inventory and the score was kept. The version 2.3 technical documentation names ORD/OUST scores supplied March 5, 2024 at 2022 block group level, formula `(LUST × 7.7 + UST count) / km²` of the block group buffered by 1,500 feet. No March 5, 2024 precomputed BG score table was found. The 7.7 factor and 1,500-foot buffer were not retuned.
 
-The service is `https://services.arcgis.com/cJ9YHowT8TU7DUyn/arcgis/rest/services/UST_Finder_Feature_Layer_2eb/FeatureServer`, downloaded 2026-10-28. State data vintage 2018–2021; tribal data October 2025. Layer `dataLastEditDate` 2026-02-13. Facilities: 742844 (Open_USTs 503630, TOS_USTs 32494). Releases: 530798 (Open 70097). Active numerator: Open_USTs + TOS_USTs at facility points. LUST numerator: Open-status release points. Geography: `cb_2022_us_bg_500k`, 242297 polygons, buffered 457.2 m in regional projected CRS. This comparison is on 243022 Harvard rows. Both present: 241748. Both null: 1102. Rebuilt null where the reference has a value: 28. Reference null where the rebuild has a value: 144. Both positive: 176394. Positive-row median ratio 1.0001488832517622. Pearson 0.9898386174024473. Spearman 0.9971602098738673. Tolerance rate 6.236039774595507e-05. The positive-row median ratio is near 1 and Pearson is reported, so the score was kept. Open-only tanks (no TOS) had median ratio 0.9990261871923211 and Pearson 0.9885825824203869. All releases including NFA had median ratio about 4.01 and Pearson about 0.693 and were not kept. PM 2.5 stays kept. NO2, DSLPM, and ozone stay kept. Hazardous waste stays pinned. Drinking water stays not kept after the ECHO retry. RMP stays not kept. Wastewater, Superfund, traffic, RSEI_AIR, life expectancy, 97.5, and the factor weights were left unchanged.
+The service is `https://services.arcgis.com/cJ9YHowT8TU7DUyn/arcgis/rest/services/UST_Finder_Feature_Layer_2eb/FeatureServer`, downloaded 2026-10-28. State data vintage 2018 to 2021; tribal data October 2025. Layer `dataLastEditDate` 2026-02-13. Facilities: 742844 (Open_USTs 503630, TOS_USTs 32494). Releases: 530798 (Open 70097). Active numerator: Open_USTs + TOS_USTs at facility points. LUST numerator: Open-status release points. Geography: `cb_2022_us_bg_500k`, 242297 polygons, buffered 457.2 m in regional projected CRS. This comparison is on 243022 Harvard rows. Both present: 241748. Both null: 1102. Rebuilt null where the reference has a value: 28. Reference null where the rebuild has a value: 144. Both positive: 176394. Positive-row median ratio 1.0001488832517622. Pearson 0.9898386174024473. Spearman 0.9971602098738673. Tolerance rate 6.236039774595507e-05. The positive-row median ratio is near 1 and Pearson is reported, so the score was kept. Open-only tanks (no TOS) had median ratio 0.9990261871923211 and Pearson 0.9885825824203869. All releases including NFA had median ratio about 4.01 and Pearson about 0.693 and were not kept. PM 2.5 stays kept. NO2, DSLPM, and ozone stay kept. Hazardous waste stays pinned. Drinking water stays not kept after the ECHO retry. RMP stays not kept. Wastewater, Superfund, traffic, RSEI_AIR, life expectancy, 97.5, and the factor weights were left unchanged.
 

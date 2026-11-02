@@ -1,8 +1,10 @@
-# Tier 2 data sources
+# Data sources
 
-Vintage: American Community Survey 2018-2022 5-year estimates. The Census API dataset is `2022/acs/acs5`. The technical documentation calls this ACS 2022 (p. 4, p. 6).
+Source pins for the EJScreen 2.3 SQL reconstruction. Demographic tables (ACS 2018-2022) come first. Environmental and proximity inputs follow. Open gaps that need non-public vintages are summarized in [`docs/publish-disclaimer.md`](publish-disclaimer.md).
 
-Geography requested: block groups in the 50 states, the District of Columbia, and Puerto Rico. The state list is the `2022/acs/acs5` state query. American Samoa, Guam, the Northern Mariana Islands, and the U.S. Virgin Islands are not in that dataset and were not requested.
+**ACS vintage:** American Community Survey 2018-2022 5-year estimates. The Census API dataset is `2022/acs/acs5`. The technical documentation calls this ACS 2022 (p. 4, p. 6).
+
+**Geography requested:** block groups in the 50 states, the District of Columbia, and Puerto Rico. The state list is the `2022/acs/acs5` state query. American Samoa, Guam, the Northern Mariana Islands, and the U.S. Virgin Islands are not in that dataset and were not requested.
 
 Variable labels below were read from `https://api.census.gov/data/2022/acs/acs5/groups/{table}.json`. The API estimate code uses an underscore and an `E` suffix. The technical documentation prints the same line with a dot.
 
@@ -186,7 +188,7 @@ Point file for sites with no polygon: U.S. EPA, `https://services.arcgis.com/cJ9
 
 ## Traffic proximity
 
-Publisher: Federal Highway Administration, U.S. Department of Transportation. The file read is the 2020 HPMS file geodatabase supplied for this run, Google Drive file id `1xWwZuqu-VF_orBg_jrgeoSSYMtcDeAIt`. It opened with the OpenFileGDB driver. `Year_Record` is 2020. There are 52 layers, named `HPMS_FULL_{ST}_2020`, one for each of the 50 states, the District of Columbia, and Puerto Rico. The annual average daily traffic field used is `AADT`.
+Publisher: Federal Highway Administration, U.S. Department of Transportation. The file read is the 2020 HPMS file geodatabase (Google Drive file id `1xWwZuqu-VF_orBg_jrgeoSSYMtcDeAIt`). It opened with the OpenFileGDB driver. `Year_Record` is 2020. There are 52 layers, named `HPMS_FULL_{ST}_2020`, one for each of the 50 states, the District of Columbia, and Puerto Rico. The annual average daily traffic field used is `AADT`.
 
 The zip is 6,264,583,550 bytes. This filesystem rejected a single file near 100 MB, so the zip is stored as `data/reference/HPMS_2020.gdb.zip.part000` through `data/reference/HPMS_2020.gdb.zip.part066`. The parts are 90 MB except the last, and they concatenate to that byte total.
 
@@ -194,7 +196,7 @@ The public catalog record `https://doi.org/10.21949/1522114` is non-public. `Hos
 
 ## RMP facility proximity
 
-The technical documentation vintage is Facility Registry Service on February 5, 2024. That snapshot was not found. The score uses the current public FRS RMP interest layer and was not kept. A 2026-10-29 scale diagnosis found the ~2× median ratio is not from PGM-row or co-location double-counting; FRS `ACTIVE_STATUS` counts about twice EPA’s documented regulated RMP facility total (~11,740), and no public active-only bulk list was available to re-score. See `docs/assumptions.md` and `internal/rmp-diagnosis-notes.md`.
+The technical documentation vintage is Facility Registry Service on February 5, 2024. That snapshot was not found. The score uses the current public FRS RMP interest layer and was not kept. A 2026-10-29 scale diagnosis found the ~2× median ratio is not from PGM-row or co-location double-counting; FRS `ACTIVE_STATUS` counts about twice EPA’s documented regulated RMP facility total (~11,740), and no public active-only bulk list was available to re-score. See [`docs/assumptions.md`](assumptions.md).
 
 Publisher: U.S. EPA, Facility Registry Service. Service: `https://services.arcgis.com/cJ9YHowT8TU7DUyn/arcgis/rest/services/FRS_INTERESTS_RMP/FeatureServer/0`. Downloaded 2026-10-28 (rechecked 2026-10-29). Layer `dataLastEditDate` 2026-10-26 00:57:17 UTC. 21855 features. Active rows (`ACTIVE_STATUS` = `ACTIVE`): 21836. Blank status: 19. Interest type is `RMP REPORTER` on every row. Unique `PGM_SYS_ID`: 21855. Unique `REGISTRY_ID`: 21569. Scored facilities after one point per `REGISTRY_ID`, valid coordinates, and dropping AS, GU, MP, and VI: 21543. Loaded as `raw.rmp_facility_frs`. The block-group score is `staging.tier3_rmp`. Method: inverse distance within 10 kilometers, cap 10 inside 0.1 kilometers, population-weighted from 2020 block centroids. On 242336 national rows, both values are present for 240939 and both are positive for 171446. The positive-row median ratio is 2.0939259982049303 and Pearson is 0.8337008027964584. The score was not kept.
 
@@ -256,7 +258,7 @@ The scored files are `DIESEL_PM10_AMBCONC_R{1-10}.zip` under `https://gaftp.epa.
 
 ## Particulate matter 2.5
 
-The version 2.3 technical documentation names a 2020 Census tract OAQPS spreadsheet, annual average PM 2.5 from monitor–CMAQ fusion (EPA-454/S-15-001), copied to child block groups and remapped from 2020 to 2022 (pp. 14 to 16). `EJscreen.pm25_2020.csv` remains HTTP 404. The score uses the public FAQSD 2020 daily fused tract file aggregated to the documented annual mean. See `docs/assumptions.md`.
+The version 2.3 technical documentation names a 2020 Census tract OAQPS spreadsheet, annual average PM 2.5 from monitor and CMAQ fusion (EPA-454/S-15-001), copied to child block groups and remapped from 2020 to 2022 (pp. 14 to 16). `EJscreen.pm25_2020.csv` remains HTTP 404. The score uses the public FAQSD 2020 daily fused tract file aggregated to the documented annual mean. See `docs/assumptions.md`.
 
 Publisher: U.S. EPA OAQPS / RSIG FAQSD. File: `https://ofmpub.epa.gov/rsig/rsigserver?data/FAQSD/outputs/2020_pm25_daily_average.txt.gz`. HTTP 200 on 2026-10-29, content-length 532375506, gzip member dated 2023-08-16 00:01:13 UTC. SHA256 `d90572344dabea13a787c6544e7271a1b07ff0513a9776064aeeb5bded5059f3`. Daily rows: 30662016. Tracts: 83776, each with 366 days. Annual mean per tract: unweighted mean of `pm25_daily_average(ug/m3)`. Local annual table: `data/pm25/faqsd_2020_annual_mean.csv`. Score file: `data/pm25/pm25_scores.csv`. Assignment: tract value to child block groups; Connecticut Geocorr 2022. On 243022 Harvard rows, both values are present for 238193 and both are positive for 238193. The positive-row median ratio is 1 and Pearson is 0.9999999999725282. The score was kept.
 
@@ -271,7 +273,7 @@ Also checked, and not kept as the 2020 indicator:
 
 ## Drinking water non-compliance
 
-The version 2.3 technical documentation names an internal ETT violation extract for SDWIS submission year 2023 Q4 (open violations 2019 Q4–2023 Q4), scored onto ORD community water system service areas and population-weighted from blocks to block groups (pp. 27 to 29). That ETT extract remains unpublished. On 2026-10-29 the public ECHO SDWA latest zip plus ORD CWS block crosswalk were scored with the printed 10/5/1 severity tiers and year increments (no invented weights). Positive-row median ratio 1.0 and Pearson about 0.14 versus published `DWATER`; not kept. See `docs/assumptions.md` and `internal/drinking-water-echo-notes.md`.
+The version 2.3 technical documentation names an internal ETT violation extract for SDWIS submission year 2023 Q4 (open violations 2019 Q4 to 2023 Q4), scored onto ORD community water system service areas and population-weighted from blocks to block groups (pp. 27 to 29). That ETT extract remains unpublished. On 2026-10-29 the public ECHO SDWA latest zip plus ORD CWS block crosswalk were scored with the printed 10/5/1 severity tiers and year increments (no invented weights). Positive-row median ratio 1.0 and Pearson about 0.14 versus published `DWATER`; not kept. See [`docs/assumptions.md`](assumptions.md).
 
 | URL | Result |
 | --- | --- |
@@ -289,7 +291,7 @@ Local comparison artifact: `data/dwater/dwater_comparison.json`.
 
 The version 2.3 technical documentation names ORD / OUST scores supplied March 5, 2024 at 2022 block group level, formula `(LUST × 7.7 + UST count) / km²` of the block group buffered by 1,500 feet (pp. 25 to 26). No March 5, 2024 block-group score table was found. The scored public inventory is UST Finder Feature Layer 2eb. See `docs/assumptions.md`.
 
-Publisher: U.S. EPA Office of Underground Storage Tanks / Office of Research and Development (UST Finder). Service: `https://services.arcgis.com/cJ9YHowT8TU7DUyn/arcgis/rest/services/UST_Finder_Feature_Layer_2eb/FeatureServer`. Downloaded 2026-10-28. State data vintage 2018–2021; tribal data October 2025. Layer `dataLastEditDate` 2026-02-13. Facilities layer: 742844 features, Open_USTs sum 503630, TOS_USTs sum 32494. Releases layer: 530798 features (Open 70097). USTs table: 2298870 rows (not used for coordinates). Local copies: `data/ust/facilities.csv`, `data/ust/releases.csv`. Score file: `data/ust/ust_scores.csv`. Block groups: Census `cb_2022_us_bg_500k.zip`. Method: `(Open LUST × 7.7 + Open_USTs + TOS_USTs) / buffered area km²`, buffer 1,500 feet. On 243022 Harvard rows, both values are present for 241748 and both are positive for 176394. The positive-row median ratio is 1.0001488832517622 and Pearson is 0.9898386174024473. The score was kept.
+Publisher: U.S. EPA Office of Underground Storage Tanks / Office of Research and Development (UST Finder). Service: `https://services.arcgis.com/cJ9YHowT8TU7DUyn/arcgis/rest/services/UST_Finder_Feature_Layer_2eb/FeatureServer`. Downloaded 2026-10-28. State data vintage 2018 to 2021; tribal data October 2025. Layer `dataLastEditDate` 2026-02-13. Facilities layer: 742844 features, Open_USTs sum 503630, TOS_USTs sum 32494. Releases layer: 530798 features (Open 70097). USTs table: 2298870 rows (not used for coordinates). Local copies: `data/ust/facilities.csv`, `data/ust/releases.csv`. Score file: `data/ust/ust_scores.csv`. Block groups: Census `cb_2022_us_bg_500k.zip`. Method: `(Open LUST × 7.7 + Open_USTs + TOS_USTs) / buffered area km²`, buffer 1,500 feet. On 243022 Harvard rows, both values are present for 241748 and both are positive for 176394. The positive-row median ratio is 1.0001488832517622 and Pearson is 0.9898386174024473. The score was kept.
 
 Also checked on 2026-10-28, and none is a March 5, 2024 precomputed BG score: `https://gaftp.epa.gov/EJScreen/` and `https://gaftp.epa.gov/OUST/` returned HTTP 404; `https://edg.epa.gov/data/public/OUST/` returned HTTP 404; `https://edg.epa.gov/data/public/ORD/` has no UST score geodatabase; sibling services `UST_Finder_Feature_Layer_2` and `US_Underground_Storage_Tank_2019` are older UST Finder composites; FRS has no `FRS_INTERESTS_UST` / `FRS_INTERESTS_LUST` FeatureServer on the EPA GeoPlatform catalog used here.
 
